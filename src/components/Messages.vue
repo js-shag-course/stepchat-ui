@@ -1,6 +1,13 @@
 <template>
   <div>
-    Messages
+    <div
+      class="message"
+      v-for="(message, i) in messages"
+      :key="i"
+    >
+      <span>{{ message.name }}:</span>
+      <div>{{ message.text }}</div>
+    </div>
   </div>
 </template>
 

@@ -1,12 +1,15 @@
 <template>
   <div>
-    <div class="message-form">
+    <div class="message-form" @keypress.enter="sendMessage()" >
       <input
         type="text"
         placeholder="Текст сообщения"
         v-model="message"
       />
-      <button :disabled="message.length === 0" @click="sendMessage()">Отправить</button>
+      <button
+        :disabled="message.length === 0"
+        @click="sendMessage()"
+      >Отправить</button>
     </div>
   </div>
 </template>

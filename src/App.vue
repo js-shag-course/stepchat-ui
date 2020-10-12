@@ -8,7 +8,11 @@
       <h1>StepChat <span>v0.1</span></h1>
     </header>
     <Users :users="usersList" class="users-list" />
-    <Messages :messages="messagesList" class="messages-list" />
+    <Messages
+      :messages="messagesList"
+      :user-name="userName"
+      class="messages-list"
+    />
     <MessageForm v-if="userName" class="form" @send-message="sendMessage" />
     <RegisterForm v-else class="form" @enter-chat="enterChat" />
     <footer>
@@ -146,6 +150,10 @@ export default {
   .messages-list {
     grid-area: messages;
     overflow-y: scroll;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .form {

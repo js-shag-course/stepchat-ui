@@ -31,16 +31,14 @@ export default {
     MessageForm,
     RegisterForm
   },
-  data: function () {
-    return {
-      root: 'http://localhost:3000', // TODO: api.stepchat.site
-      user: 'http://localhost:3000/user',
-      message: 'http://localhost:3000/message',
-      messagesList: null,
-      usersList: null,
-      userName: null
-    }
-  },
+  data: () => ({
+    root: 'http://api.stepchat.site', // TODO: api.stepchat.site
+    user: 'http://api.stepchat.site/user',
+    message: 'http://api.stepchat.site/message',
+    messagesList: null,
+    usersList: null,
+    userName: null
+  }),
   methods: {
     async enterChat (name) {
       const user = await fetch(this.user, {
@@ -142,10 +140,12 @@ export default {
 
   .users-list {
     grid-area: users;
+    overflow-y: scroll;
   }
 
   .messages-list {
     grid-area: messages;
+    overflow-y: scroll;
   }
 
   .form {

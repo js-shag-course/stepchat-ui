@@ -7,7 +7,7 @@
       </svg>
       <h1>StepChat <span>v0.1</span></h1>
     </header>
-    <Users :users="usersList" class="users-list" />
+    <Users :users="users" class="users-list" />
     <Messages
       :messages="messagesList"
       :user-name="userName"
@@ -22,6 +22,8 @@
 </template>
 
 <script>
+import randomstring from 'randomstring'
+
 import Messages from '@/components/Messages'
 import Users from '@/components/Users'
 import MessageForm from '@/components/MessageForm'
@@ -40,9 +42,41 @@ export default {
     user: 'http://api.stepchat.site/user',
     message: 'http://api.stepchat.site/message',
     messagesList: null,
-    usersList: null,
+    usersList: [],
+    avatarsList: [],
     userName: null
   }),
+  computed: {
+    totalUsers () {
+      return this.usersList.length
+    },
+    users () {
+      const users = []
+      for (let i = 0; i < this.totalUsers; i++) {
+        users.push({
+          name: this.usersList[i],
+          avatar: this.avatarsList[i]
+        })
+      }
+
+      return users
+    }
+  },
+  watch: {
+    totalUsers (newVal, oldVal) {
+      if (oldVal === 0) {
+        for (let i = 0; i < newVal; i++) {
+          this.avatarsList.push('https://robohash.org/' + randomstring.generate(7))
+        }
+      }
+      // TODO: Доделать!
+      if (newVal > oldVal) {
+        // +++
+      } else {
+        // ---
+      }
+    }
+  },
   methods: {
     async enterChat (name) {
       const user = await fetch(this.user, {

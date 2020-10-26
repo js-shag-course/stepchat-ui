@@ -7,6 +7,18 @@
       </svg>
       <h1>StepChat <span>v0.1</span></h1>
     </header>
+    <div v-if="!userName" class="reg-auth-form">
+      <div class="modal">
+        <div>
+          <button @click="enterForm = 'Registration'">Регистрация</button> |
+          <button @click="enterForm = 'Authentication'">Вход</button>
+          <component
+            :is="enterForm"
+            @send-query="toWebsocket"
+          />
+        </div>
+      </div>
+    </div>
     <Users :users="users" class="users-list" />
     <Messages
       :messages="messagesList"
@@ -24,10 +36,15 @@
 <script>
 import randomstring from 'randomstring'
 
+import Registration from './components/Registration'
+import Authentication from './components/Authentication'
+
 import Messages from '@/components/Messages'
 import Users from '@/components/Users'
 import MessageForm from '@/components/MessageForm'
 import RegisterForm from '@/components/RegisterForm'
+
+let ws
 
 export default {
   name: 'App',
@@ -35,7 +52,9 @@ export default {
     Messages,
     Users,
     MessageForm,
-    RegisterForm
+    RegisterForm,
+    Registration,
+    Authentication
   },
   data: () => ({
     root: 'http://api.stepchat.site', // TODO: api.stepchat.site
@@ -44,7 +63,8 @@ export default {
     messagesList: null,
     usersList: [],
     avatarsList: [],
-    userName: null
+    userName: null,
+    enterForm: 'Registration'
   }),
   computed: {
     totalUsers () {
@@ -93,17 +113,40 @@ export default {
         body: JSON.stringify({ name: this.userName, text: messageText })
       })
       if (!message.ok) alert('Не удалось отправить сообщение, сорян... ')
+    },
+    toWebsocket (msg) {
+      ws.send(JSON.stringify(msg))
     }
+
+    // TODO:
+    // Регистрация пользователя
+    // Авторизация пользователя
+    // Отправка сообщения
+    // Выход
   },
-  async beforeMount () {
-    setInterval(async () => {
-      const response = await fetch(this.root)
-      if (response.ok) {
-        const data = await response.json()
-        this.messagesList = data.messages
-        this.usersList = data.users
+  beforeMount () {
+    const self = this
+
+    ws = new WebSocket('ws://localhost:8080')
+    // ws.onopen = () => {}
+    ws.onmessage = function (msg) {
+      const response = JSON.parse(msg.data)
+      if (response.action === 'sendData') {
+        self.messagesList = response.payload.messages
+        self.usersList = response.payload.users
       }
-    }, 1000)
+      if (response.action === 'sendStatus') {
+        if (response.payload.login) {
+          self.userName = response.payload.login
+        }
+      }
+    }
+    ws.onerror = function (e) {
+      //
+    }
+    ws.onclose = function (e) {
+      //
+    }
   }
 }
 </script>
@@ -203,6 +246,30 @@ export default {
     align-items: center;
 
     font-weight: 300;
+  }
+
+  .reg-auth-form {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 5;
+
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .modal {
+      background: #fff;
+      width: 50%;
+      height: 80%;
+
+      box-sizing: border-box;
+      padding: 12px;
+    }
   }
 
 </style>
